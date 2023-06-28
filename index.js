@@ -63,3 +63,4 @@ webserver.get("/variants", (req, res) => {
 webserver.listen(port, () => {
   console.log("web server running on port " + port);
 });
+

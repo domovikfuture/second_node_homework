@@ -5,7 +5,7 @@ const webserver = express();
 webserver.use("/jsFiles", express.static(__dirname + "/public"));
 webserver.use(express.json());
 
-const port = 3000;
+const port = 22;
 
 const html = `<html lang="en">
 <head>

@@ -1,5 +1,5 @@
-const handleVote = (code) => {
-  fetch("/vote", {
+const handleVote = async (code) => {
+  const data = await fetch("/vote", {
     method: "POST",
     body: JSON.stringify({
       code: Number(code),
@@ -8,6 +8,8 @@ const handleVote = (code) => {
       "Content-type": "application/json; charset=UTF-8",
     },
   });
+  const parsedData = await data.json();
+  return parsedData
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -23,11 +25,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   buttonsBlock.innerHTML = buttonsHtml;
 
   buttonsBlock.addEventListener("click", async (e) => {
-    await handleVote(e.target.innerText.split("- ")[1]);
-    const result = await fetch("/stats");
-    const parsedResult = await result.json();
+    const data = await handleVote(e.target.innerText.split("- ")[1]);
     const statsBlock = document.querySelector(".stats");
-    let statsHtml = parsedResult.stats
+    let statsHtml = data.stats
       .map((item) => {
         return `<span>${item[0]} - ${item[1]}</span><br>`;
       })

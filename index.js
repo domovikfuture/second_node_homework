@@ -5,7 +5,7 @@ const webserver = express();
 webserver.use("/jsFiles", express.static(__dirname + "/public"));
 webserver.use(express.json());
 
-const port = 80;
+const port = 3000;
 
 const html = `<html lang="en">
 <head>
@@ -49,10 +49,6 @@ webserver.post("/vote", (req, res) => {
   ).option;
   const previousValue = voteStatistics.get(voteOptionName) ?? 0;
   voteStatistics.set(voteOptionName, previousValue + 1);
-  res.send(200);
-});
-
-webserver.get("/stats", (req, res) => {
   res.send({ stats: [...voteStatistics] });
 });
 

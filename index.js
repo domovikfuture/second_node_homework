@@ -1,13 +1,12 @@
 const express = require("express");
 const fs = require("fs");
+
 const webserver = express();
 
 webserver.use("/publicFiles", express.static(__dirname + "/public"));
 webserver.use(express.json());
 
-const port = 80;
-
-const voteStatistics = new Map();
+const port = 3060;
 
 webserver.get("/", (req, res) => {
   fs.readFile(__dirname + "/public/markup.html", (error, data) => {
@@ -18,14 +17,41 @@ webserver.get("/", (req, res) => {
 });
 
 webserver.post("/vote", (req, res) => {
-  fs.readFile(__dirname + "/public/voteVariants.json", (error, data) => {
+  fs.readFile(
+    __dirname + "/public/voteVariants.json",
+    (error, voteVariantsData) => {
+      if (error) throw error;
+      fs.readFile(
+        __dirname + "/public/voteStatistics.json",
+        (error, voteStatisticsData) => {
+          if (error) throw error;
+          const voteStatistics = JSON.parse(voteStatisticsData);
+          const voteOptionName = JSON.parse(voteVariantsData).find(
+            (item) => item.code === req.body.code
+          ).option;
+          const previousValue = voteStatistics[voteOptionName] ?? 0;
+
+          voteStatistics[voteOptionName] = previousValue + 1;
+
+          fs.writeFileSync(
+            __dirname + "/public/voteStatistics.json",
+            JSON.stringify(voteStatistics),
+            (error) => {
+              if (error) throw error;
+              res.end();
+            }
+          );
+        }
+      );
+    }
+  );
+});
+
+webserver.post("/stats", (req, res) => {
+  fs.readFile(__dirname + "/public/voteStatistics.json", (error, data) => {
     if (error) throw error;
-    const voteOptionName = JSON.parse(data).find(
-      (item) => item.code === req.body.code
-    ).option;
-    const previousValue = voteStatistics.get(voteOptionName) ?? 0;
-    voteStatistics.set(voteOptionName, previousValue + 1);
-    res.send({ stats: [...voteStatistics] });
+    res.write(data);
+    res.end();
   });
 });
 

@@ -1,5 +1,5 @@
-const handleVote = async (code) => {
-  const data = await fetch("/vote", {
+const handleVote = (code) => {
+  fetch("/vote", {
     method: "POST",
     body: JSON.stringify({
       code: Number(code),
@@ -8,12 +8,9 @@ const handleVote = async (code) => {
       "Content-type": "application/json; charset=UTF-8",
     },
   });
-  const parsedData = await data.json();
-  return parsedData
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const statsButton = document.querySelector(".statsButton");
   const buttonsBlock = document.querySelector(".buttons");
   const result = await fetch("/variants");
   const parsedResult = await result.json();
@@ -25,11 +22,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   buttonsBlock.innerHTML = buttonsHtml;
 
   buttonsBlock.addEventListener("click", async (e) => {
-    const data = await handleVote(e.target.innerText.split("- ")[1]);
+    await handleVote(e.target.innerText.split("- ")[1]);
+    const data = await fetch("/stats", {
+      method: "POST",
+    });
+    const parsedData = await data.json();
     const statsBlock = document.querySelector(".stats");
-    let statsHtml = data.stats
+    let statsHtml = Object.keys(parsedData)
       .map((item) => {
-        return `<span>${item[0]} - ${item[1]}</span><br>`;
+        return `<span>${item} - ${parsedData[item]}</span><br>`;
       })
       .join("");
     statsBlock.innerHTML = statsHtml;

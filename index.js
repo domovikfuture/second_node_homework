@@ -6,7 +6,7 @@ const webserver = express();
 webserver.use("/publicFiles", express.static(__dirname + "/public"));
 webserver.use(express.json());
 
-const port = 3060;
+const port = 80;
 
 webserver.get("/", (req, res) => {
   fs.readFile(__dirname + "/public/markup.html", (error, data) => {
@@ -33,11 +33,12 @@ webserver.post("/vote", (req, res) => {
 
           voteStatistics[voteOptionName] = previousValue + 1;
 
-          fs.writeFileSync(
+          fs.writeFile(
             __dirname + "/public/voteStatistics.json",
             JSON.stringify(voteStatistics),
             (error) => {
               if (error) throw error;
+              console.log("/vote", voteStatistics)
               res.end();
             }
           );
@@ -51,6 +52,7 @@ webserver.post("/stats", (req, res) => {
   fs.readFile(__dirname + "/public/voteStatistics.json", (error, data) => {
     if (error) throw error;
     res.write(data);
+    console.log("/stats", JSON.parse(data))
     res.end();
   });
 });

@@ -1,15 +1,3 @@
-const handleVote = (code) => {
-  fetch("/vote", {
-    method: "POST",
-    body: JSON.stringify({
-      code: Number(code),
-    }),
-    headers: {
-      "Content-type": "application/json; charset=UTF-8",
-    },
-  });
-};
-
 document.addEventListener("DOMContentLoaded", async () => {
   const buttonsBlock = document.querySelector(".buttons");
   const result = await fetch("/variants");
@@ -22,7 +10,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   buttonsBlock.innerHTML = buttonsHtml;
 
   buttonsBlock.addEventListener("click", async (e) => {
-    await handleVote(e.target.innerText.split("- ")[1]);
+    await fetch("/vote", {
+      method: "POST",
+      body: JSON.stringify({
+        code: Number(e.target.innerText.split("- ")[1]),
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    });
     const data = await fetch("/stats", {
       method: "POST",
     });

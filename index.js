@@ -1,12 +1,13 @@
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 
 const webserver = express();
 
 webserver.use("/publicFiles", express.static(__dirname + "/public"));
 webserver.use(express.json());
 
-const port = 80;
+const port = 3000;
 
 webserver.get("/", (req, res) => {
   fs.readFile(__dirname + "/public/markup.html", (error, data) => {
@@ -38,7 +39,7 @@ webserver.post("/vote", (req, res) => {
             JSON.stringify(voteStatistics),
             (error) => {
               if (error) throw error;
-              console.log("/vote", voteStatistics)
+              console.log("/vote", voteStatistics);
               res.end();
             }
           );
@@ -52,9 +53,17 @@ webserver.post("/stats", (req, res) => {
   fs.readFile(__dirname + "/public/voteStatistics.json", (error, data) => {
     if (error) throw error;
     res.write(data);
-    console.log("/stats", JSON.parse(data))
     res.end();
   });
+});
+
+webserver.post("/download", (req, res) => {
+  console.log(req.get('Accept'))
+  res.setHeader("Content-Type", req.get('Accept'))
+  const readStream = fs.createReadStream(
+    path.join(__dirname, "/public/voteStatistics.json")
+  );
+  readStream.pipe(res);
 });
 
 webserver.get("/variants", (req, res) => {

@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   downloadButtonsBlock.addEventListener("click", async (e) => {
     const accept = e.target.innerText.split(" ")[1];
     const res = await fetch("/download", {
-      method: "POST",
       headers: {
         Accept: accept,
       },
@@ -33,6 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const data = await res.blob();
     const fakeButton = document.createElement("a");
     fakeButton.href = window.URL.createObjectURL(new Blob([data]));
+    fakeButton.download = `result.${accept.split('/')[1]}`
     fakeButton.click();
   });
 
